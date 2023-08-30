@@ -19,7 +19,7 @@ data = {"data" : "What is the history or anicent china?"}
 
 body = str.encode(json.dumps(data))
 
-url = 'https://z815llama-ws-dsnlj.chinanorth3.inference.ml.azure.cn/score'
+url = ''
 # Replace this with the primary/secondary key or AMLToken for the endpoint
 api_key = ''
 if not api_key:
