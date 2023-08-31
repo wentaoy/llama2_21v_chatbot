@@ -15,9 +15,35 @@ allowSelfSignedHttps(True) # this line is needed if you use self-signed certific
 # depending on the format your endpoint expects.
 # More information can be found here:
 # https://docs.microsoft.com/azure/machine-learning/how-to-deploy-advanced-entry-script
-data = {"data" : "What is the history or anicent china?"}
 
-body = str.encode(json.dumps(data))
+json_data = {
+  "input_data": {
+    "input_string": [
+      {
+        "role": "user",
+        "content": "I am going to Paris, what should I see?"
+      },
+      {
+        "role": "assistant",
+        "content": "Paris, the capital of France, is known for its stunning architecture, art museums, historical landmarks, and romantic atmosphere. Here are some of the top attractions to see in Paris:\n\n1. The Eiffel Tower: The iconic Eiffel Tower is one of the most recognizable landmarks in the world and offers breathtaking views of the city.\n2. The Louvre Museum: The Louvre is one of the world's largest and most famous museums, housing an impressive collection of art and artifacts, including the Mona Lisa.\n3. Notre-Dame Cathedral: This beautiful cathedral is one of the most famous landmarks in Paris and is known for its Gothic architecture and stunning stained glass windows.\n\nThese are just a few of the many attractions that Paris has to offer. With so much to see and do, it's no wonder that Paris is one of the most popular tourist destinations in the world."
+      },
+      {
+        "role": "user",
+        "content": "What is so great about #1?"
+      }
+    ],
+    "parameters": {
+      "max_length": 200,
+      "temperature": 0.6,
+      "top_p": 0.9,
+      "do_sample": True,
+      "max_new_tokens": 200
+    }
+  }
+}
+#data = {"data" : "What is the history or anicent china?"}
+
+body = str.encode(json.dumps(json_data))
 
 url = ''
 # Replace this with the primary/secondary key or AMLToken for the endpoint
@@ -36,6 +62,7 @@ try:
 
     result = response.read()
     print(result)
+    print(type(result))
 except urllib.error.HTTPError as error:
     print("The request failed with status code: " + str(error.code))
 
