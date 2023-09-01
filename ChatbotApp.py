@@ -7,6 +7,9 @@ import os
 st.set_page_config(page_title="🦙💬 Llama 2 On 21V Azure Chatbot")
 with st.sidebar:
     st.title('Llama2🦙 on :blue[Azure 21v] :sunglasses:')
+    st.divider()
+    st.subheader('Brief Introduction')
+    st.text("Llama2 Model is registered as a custom model \nin Azure Machine Learning on 21V CN3. \n\nThe model you chatting with is Llama2-7b-chat.")
 
 # Get Endpoint API Key Credentials
 ENDPOINT_API_KEY = st.secrets["endpoint_api_key"]
@@ -22,13 +25,18 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
+st.sidebar.divider()
+st.sidebar.subheader('Parameters you can change for Llama2 Model')
+temperature = st.sidebar.slider('temperature', min_value=0.01, max_value=5.0, value=0.1, step=0.01)
+top_p = st.sidebar.slider('top_p', min_value=0.01, max_value=1.0, value=0.9, step=0.01)
+max_length = st.sidebar.slider('max_length', min_value=32, max_value=128, value=120, step=8)
+
 # creates a Clear Chat History button in the sidebar, allowing users to clear the chat history by 
 # leveraging the callback function
 def clear_chat_history():
     st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
+st.sidebar.divider()
 st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
-
-
 
 # Function for generating LLaMA2 response
 def generate_llama2_response(prompt_input):
@@ -41,9 +49,8 @@ def generate_llama2_response(prompt_input):
         else:
             string_dialogue += "Assistant: " + dict_message["content"] + "\\n\\n"
             prompt_list.append({"role": "assistant", "content": dict_message["content"]})
-    print(prompt_list)
     # reformat the input string to json
-    json_input = prompt2json(prompt_input)
+    json_input = prompt2json(prompt_input, temperature, top_p, max_length)
     # get output from model endpoint
     output = endpoint_response(json_input)
     # get string type of output instead of class bytes
@@ -51,10 +58,7 @@ def generate_llama2_response(prompt_input):
     output_string = output_json['output']
     return output_string
 
-def prompt2json(prompt_input):
-    max_length = 200
-    temperature = 0.6
-    top_p = 0.9
+def prompt2json(prompt_input, temperature, top_p, max_length):
     do_sample = True
     max_new_tokens = 200
     data = {
@@ -132,3 +136,4 @@ if st.session_state.messages[-1]["role"] != "assistant":
             placeholder.markdown(full_response)
     message = {"role": "assistant", "content": full_response}
     st.session_state.messages.append(message)
+
